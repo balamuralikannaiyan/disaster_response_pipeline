@@ -40,7 +40,7 @@ def clean_data(df):
       """      
             
     # create a dataframe of the 36 individual category columns by expanding the categories
-    category_columns = df['cartegoies'].str.split(";", expand = True)
+    category_columns = df['categories'].str.split(";", expand = True)
     # select the first row of the categories dataframe
     first_row = category_columns.iloc[0]
 
@@ -54,7 +54,9 @@ def clean_data(df):
         category_columns[column] = category_columns[column].apply(lambda x:x[-1])
     # convert column from string to numeric
         category_columns[column] = category_columns[column].astype(int)
-    
+    #changing the related column to binary by changing 2's to 1's
+    category_columns['related'] = category_columns['related'].apply(lambda x:1 if x>0 else 0)
+
     # drop the original categories column from `df`
     df = df.drop('categories', axis = 1)
     
@@ -77,7 +79,8 @@ def save_data(df, database_filename):
 
       """
     engine = create_engine(f"sqlite:///{database_filename}")
-    df.to_sql('disaster_messages_categories', engine, index=False)
+    df.to_sql('disaster_messages_categories', engine, index=False,if_exists='replace')
+
 
 
 def main():
